@@ -3,11 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <title>Metronome Timer</title>
+
+<style>
+#arm {
+  width: 4px;
+  height: 120px;
+  background: black;
+  margin: 40px auto;
+  transform-origin: bottom center;
+  transition: transform 0.1s linear;
+}
+</style>
+
 </head>
 
 <body style="text-align:center; font-family:sans-serif;">
 
 <h1>🎵 メトロノーム + タイマー</h1>
+
+<p style="color:red; font-weight:bold;">
+※ iPhoneで音が出ない場合は、サイレントモード（消音）をオフにしてください
+</p>
+
+<!-- 🔥アニメーション -->
+<div id="arm"></div>
 
 <h2 id="status">停止中</h2>
 <h2 id="timer">4:50</h2>
@@ -17,7 +36,6 @@
 
 <br><br>
 
-<!-- タイマー選択 -->
 <button onclick="setMode(290)">4分50秒</button>
 <button onclick="setMode(60)">1分</button>
 <button onclick="setMode(30)">30秒</button>
@@ -37,7 +55,11 @@ let audioCtx;
 let duration = 290;
 let remaining = 290;
 
+let direction = 1;
+
 function playClick(){
+
+  // 🔥音
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
 
@@ -50,6 +72,11 @@ function playClick(){
 
   osc.start(audioCtx.currentTime);
   osc.stop(audioCtx.currentTime + 0.1);
+
+  // 🔥アニメーション同期
+  direction *= -1;
+  document.getElementById("arm").style.transform =
+    `rotate(${direction * 30}deg)`;
 }
 
 function updateTimer(){
