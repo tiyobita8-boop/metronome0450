@@ -25,7 +25,6 @@
 ※ iPhoneで音が出ない場合は、サイレントモード（消音）をオフにしてください
 </p>
 
-<!-- 🔥アニメーション -->
 <div id="arm"></div>
 
 <h2 id="status">停止中</h2>
@@ -57,9 +56,8 @@ let remaining = 290;
 
 let direction = 1;
 
+// 🔥メトロノーム音
 function playClick(){
-
-  // 🔥音
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
 
@@ -73,10 +71,31 @@ function playClick(){
   osc.start(audioCtx.currentTime);
   osc.stop(audioCtx.currentTime + 0.1);
 
-  // 🔥アニメーション同期
+  // アニメーション同期
   direction *= -1;
   document.getElementById("arm").style.transform =
     `rotate(${direction * 30}deg)`;
+}
+
+// 🔥終了音（チンチン）
+function playEndSound(){
+  for(let i = 0; i < 2; i++){
+    setTimeout(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.frequency.value = 2000; // 高音
+      gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.3);
+
+    }, i * 300);
+  }
 }
 
 function updateTimer(){
@@ -88,6 +107,7 @@ function updateTimer(){
 
   if(remaining <= 0){
     stop();
+    playEndSound(); // 🔥ここ追加
     return;
   }
 
