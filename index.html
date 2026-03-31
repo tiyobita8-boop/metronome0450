@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Metronome Timer</title>
+</head>
+
+<body style="text-align:center; font-family:sans-serif;">
+
+<h1>🎵 メトロノーム + タイマー</h1>
+
+<h2 id="status">停止中</h2>
+<h2 id="timer">4:50</h2>
+
+<label>BPM:</label>
+<input type="number" id="bpm" value="60" style="width:60px;">
+
+<br><br>
+
+<button onclick="start()">▶ スタート</button>
+<button onclick="stop()">⏹ ストップ</button>
+
+<script>
+
+let metroInterval;
+let timerInterval;
+let audioCtx;
+let remaining = 290;
+
+function playClick(){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.frequency.value = 1000;
+  gain.gain.setValueAtTime(1, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.1);
+}
+
+function updateTimer(){
+  let min = Math.floor(remaining / 60);
+  let sec = remaining % 60;
+
+  document.getElementById("timer").innerText =
+    min + ":" + sec.toString().padStart(2, '0');
+
+  if(remaining <= 0){
+    stop();
+    return;
+  }
+
+  remaining--;
+}
+
+function start(){
+  if(metroInterval) return;
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  let bpm = document.getElementById("bpm").value;
+  let intervalTime = 60000 / bpm;
+
+  remaining = 290;
+
+  document.getElementById("status").innerText = "再生中";
+
+  // 🔥即クリック音
+  playClick();
+
+  // 🔥即カウント更新（ここが修正ポイント）
+  updateTimer();
+
+  metroInterval = setInterval(playClick, intervalTime);
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+function stop(){
+  clearInterval(metroInterval);
+  clearInterval(timerInterval);
+
+  metroInterval = null;
+  timerInterval = null;
+
+  document.getElementById("status").innerText = "停止中";
+}
+
+</script>
+
+</body>
+</html>
