@@ -17,29 +17,25 @@
 
 <br><br>
 
-<!-- 🔥時間選択 -->
-<button onclick="setTime(290)">4分50秒</button>
-<button onclick="setTime(60)">1分</button>
-<button onclick="setTime(30)">30秒</button>
+<!-- タイマー選択 -->
+<button onclick="setMode(290)">4分50秒</button>
+<button onclick="setMode(60)">1分</button>
+<button onclick="setMode(30)">30秒</button>
 
 <br><br>
 
 <button onclick="start()">▶ スタート</button>
 <button onclick="stop()">⏹ ストップ</button>
+<button onclick="reset()">🔄 リセット</button>
 
 <script>
 
 let metroInterval;
 let timerInterval;
 let audioCtx;
-let remaining = 290;
-let initialTime = 290;
 
-function setTime(sec){
-  initialTime = sec;
-  remaining = sec;
-  updateDisplay();
-}
+let duration = 290;
+let remaining = 290;
 
 function playClick(){
   const osc = audioCtx.createOscillator();
@@ -56,16 +52,12 @@ function playClick(){
   osc.stop(audioCtx.currentTime + 0.1);
 }
 
-function updateDisplay(){
+function updateTimer(){
   let min = Math.floor(remaining / 60);
   let sec = remaining % 60;
 
   document.getElementById("timer").innerText =
     min + ":" + sec.toString().padStart(2, '0');
-}
-
-function updateTimer(){
-  updateDisplay();
 
   if(remaining <= 0){
     stop();
@@ -83,14 +75,9 @@ function start(){
   let bpm = document.getElementById("bpm").value;
   let intervalTime = 60000 / bpm;
 
-  remaining = initialTime;
-
   document.getElementById("status").innerText = "再生中";
 
-  // 即クリック
   playClick();
-
-  // 即カウント更新
   updateTimer();
 
   metroInterval = setInterval(playClick, intervalTime);
@@ -105,6 +92,27 @@ function stop(){
   timerInterval = null;
 
   document.getElementById("status").innerText = "停止中";
+}
+
+function reset(){
+  stop();
+  remaining = duration;
+  updateDisplay();
+}
+
+function setMode(sec){
+  stop();
+  duration = sec;
+  remaining = sec;
+  updateDisplay();
+}
+
+function updateDisplay(){
+  let min = Math.floor(remaining / 60);
+  let sec = remaining % 60;
+
+  document.getElementById("timer").innerText =
+    min + ":" + sec.toString().padStart(2, '0');
 }
 
 </script>
