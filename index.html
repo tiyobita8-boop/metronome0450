@@ -56,20 +56,23 @@ let remaining = 290;
 
 let direction = 1;
 
-// 🔥メトロノーム音
+// 🔥 カチカチ音（変更ポイント）
 function playClick(){
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
 
+  osc.type = "square"; // ←ここ重要（カチッとした音）
+  osc.frequency.value = 1500;
+
   osc.connect(gain);
   gain.connect(audioCtx.destination);
 
-  osc.frequency.value = 1000;
+  // 超短い鋭い音にする
   gain.gain.setValueAtTime(1, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
 
   osc.start(audioCtx.currentTime);
-  osc.stop(audioCtx.currentTime + 0.1);
+  osc.stop(audioCtx.currentTime + 0.03);
 
   // アニメーション同期
   direction *= -1;
@@ -87,7 +90,7 @@ function playEndSound(){
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
-      osc.frequency.value = 2000; // 高音
+      osc.frequency.value = 2000;
       gain.gain.setValueAtTime(1, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
 
@@ -107,7 +110,7 @@ function updateTimer(){
 
   if(remaining <= 0){
     stop();
-    playEndSound(); // 🔥ここ追加
+    playEndSound();
     return;
   }
 
